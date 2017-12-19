@@ -24,11 +24,11 @@ characterLiterals : Test
 characterLiterals =
     describe "Character literals"
         [ test "character literal" <|
-            \() -> "'a'" |> isExpression (Character 'a' { line = 1, column = 0 })
+            \() -> "'a'" |> isExpression (Character 'a' { line = 0, column = 0 })
         , test "newline literal" <|
-            \() -> "'\n'" |> isExpression (Character '\n' { line = 1, column = 0 })
+            \() -> "'\n'" |> isExpression (Character '\n' { line = 0, column = 0 })
         , test "Charcode literals" <|
-            \() -> "'\\x23'" |> isExpression (Character '#' { line = 1, column = 0 })
+            \() -> "'\\x23'" |> isExpression (Character '#' { line = 0, column = 0 })
         , test "character literals must contain one character" <|
             \() -> fails "''"
         ]
@@ -38,11 +38,11 @@ intLiterals : Test
 intLiterals =
     describe "Integer literals"
         [ test "integer literal" <|
-            \() -> "0" |> isExpression (Integer 0 { line = 1, column = 0 })
+            \() -> "0" |> isExpression (Integer 0 { line = 0, column = 0 })
         , test "positive literal" <|
-            \() -> "+12" |> isExpression (Integer 12 { line = 1, column = 0 })
+            \() -> "+12" |> isExpression (Integer 12 { line = 0, column = 0 })
         , test "negative literal" <|
-            \() -> "-12" |> isExpression (Integer -12 { line = 1, column = 0 })
+            \() -> "-12" |> isExpression (Integer -12 { line = 0, column = 0 })
         ]
 
 
@@ -50,11 +50,11 @@ floatLiterals : Test
 floatLiterals =
     describe "Float literals"
         [ test "float literal" <|
-            \() -> "0.5" |> isExpression (Float 0.5 { line = 1, column = 0 })
+            \() -> "0.5" |> isExpression (Float 0.5 { line = 0, column = 0 })
         , test "positive literal" <|
-            \() -> "+12.5" |> isExpression (Float 12.5 { line = 1, column = 0 })
+            \() -> "+12.5" |> isExpression (Float 12.5 { line = 0, column = 0 })
         , test "negative literal" <|
-            \() -> "-12.5" |> isExpression (Float -12.5 { line = 1, column = 0 })
+            \() -> "-12.5" |> isExpression (Float -12.5 { line = 0, column = 0 })
         ]
 
 
@@ -62,17 +62,17 @@ stringLiterals : Test
 stringLiterals =
     describe "String literals"
         [ test "empty string" <|
-            \() -> "\"\"" |> isExpression (String "" { line = 1, column = 0 })
+            \() -> "\"\"" |> isExpression (String "" { line = 0, column = 0 })
         , test "simple string" <|
-            \() -> "\"hello\"" |> isExpression (String "hello" { line = 1, column = 0 })
+            \() -> "\"hello\"" |> isExpression (String "hello" { line = 0, column = 0 })
         , test "escaped string" <|
-            \() -> "\"hello, \\\"world\\\"\"" |> isExpression (String "hello, \\\"world\\\"" { line = 1, column = 0 })
+            \() -> "\"hello, \\\"world\\\"\"" |> isExpression (String "hello, \\\"world\\\"" { line = 0, column = 0 })
         , test "triple-quoted string" <|
-            \() -> "\"\"\"\"\"\"" |> isExpression (String "" { line = 1, column = 0 })
+            \() -> "\"\"\"\"\"\"" |> isExpression (String "" { line = 0, column = 0 })
         , test "multi-line strings" <|
-            \() -> "\"\"\"hello\nworld\"\"\"" |> isExpression (String "hello\nworld" { line = 1, column = 0 })
+            \() -> "\"\"\"hello\nworld\"\"\"" |> isExpression (String "hello\nworld" { line = 0, column = 0 })
         , test "double escaped string" <|
-            \() -> "\"\\\\\"" |> isExpression (String "\\\\" { line = 1, column = 0 })
+            \() -> "\"\\\\\"" |> isExpression (String "\\\\" { line = 0, column = 0 })
         ]
 
 
@@ -94,30 +94,30 @@ letExpressions =
                 "let a = 42 in a"
                     |> isExpression
                         (Let
-                            [ ( var "a" { line = 1, column = 4 }
-                              , Integer 42 { line = 1, column = 8 }
+                            [ ( var "a" { line = 0, column = 4 }
+                              , Integer 42 { line = 0, column = 8 }
                               )
                             ]
-                            (var "a" { line = 1, column = 14 })
-                            { line = 1, column = 0 }
+                            (var "a" { line = 0, column = 14 })
+                            { line = 0, column = 0 }
                         )
         , test "bind to _" <|
             \() ->
                 "let _ = 42 in 24"
                     |> isExpression
                         (Let
-                            [ ( var "_" { line = 1, column = 4 }, Integer 42 { line = 1, column = 8 } ) ]
-                            (Integer 24 { line = 1, column = 14 })
-                            { line = 1, column = 0 }
+                            [ ( var "_" { line = 0, column = 4 }, Integer 42 { line = 0, column = 8 } ) ]
+                            (Integer 24 { line = 0, column = 14 })
+                            { line = 0, column = 0 }
                         )
         , test "Can start with a tag name" <|
             \() ->
                 "let letter = 1 \n in letter"
                     |> isExpression
                         (Let
-                            [ ( var "letter" { line = 1, column = 4 }, Integer 1 { line = 1, column = 13 } ) ]
-                            (var "letter" { line = 2, column = 4 })
-                            { line = 1, column = 0 }
+                            [ ( var "letter" { line = 0, column = 4 }, Integer 1 { line = 0, column = 13 } ) ]
+                            (var "letter" { line = 1, column = 4 })
+                            { line = 0, column = 0 }
                         )
         , test "function 1" <|
             \() ->
@@ -130,7 +130,49 @@ in
                     |> isExpression
                         (Let
                             [ ( Application
-                                    (var "f" { line = 1, column = 1 })
+                                    (var "f" { line = 0, column = 1 })
+                                    (var "x" { line = 0, column = 3 })
+                                    { line = 0, column = 2 }
+                              , (BinOp
+                                    (var "+" { line = 0, column = 10 })
+                                    (var "x" { line = 0, column = 7 })
+                                    (Integer 1 { line = 0, column = 11 })
+                                    { line = 0, column = 10 }
+                                )
+                              )
+                            ]
+                            (Application
+                                (var "f" { line = 3, column = 2 })
+                                (Integer 4 { line = 3, column = 4 })
+                                { line = 3, column = 3 }
+                            )
+                            { line = 0, column = 0 }
+                        )
+        , test "function 2" <|
+            \() ->
+                """
+let
+  f x = x + 1
+  g x = x + 1
+in
+  f 4
+        """
+                    |> isExpression
+                        (Let
+                            [ ( (Application
+                                    (var "f" { line = 0, column = 1 })
+                                    (var "x" { line = 0, column = 3 })
+                                    { line = 0, column = 2 }
+                                )
+                              , (BinOp
+                                    (var "+" { line = 0, column = 10 })
+                                    (var "x" { line = 0, column = 7 })
+                                    (Integer 1 { line = 0, column = 11 })
+                                    { line = 0, column = 10 }
+                                )
+                              )
+                            , ( Application
+                                    (var "g" { line = 1, column = 1 })
                                     (var "x" { line = 1, column = 3 })
                                     { line = 1, column = 2 }
                               , (BinOp
@@ -146,49 +188,7 @@ in
                                 (Integer 4 { line = 4, column = 4 })
                                 { line = 4, column = 3 }
                             )
-                            { line = 1, column = 0 }
-                        )
-        , test "function 2" <|
-            \() ->
-                """
-let
-  f x = x + 1
-  g x = x + 1
-in
-  f 4
-        """
-                    |> isExpression
-                        (Let
-                            [ ( (Application
-                                    (var "f" { line = 1, column = 1 })
-                                    (var "x" { line = 1, column = 3 })
-                                    { line = 1, column = 2 }
-                                )
-                              , (BinOp
-                                    (var "+" { line = 1, column = 10 })
-                                    (var "x" { line = 1, column = 7 })
-                                    (Integer 1 { line = 1, column = 11 })
-                                    { line = 1, column = 10 }
-                                )
-                              )
-                            , ( Application
-                                    (var "g" { line = 2, column = 1 })
-                                    (var "x" { line = 2, column = 3 })
-                                    { line = 2, column = 2 }
-                              , (BinOp
-                                    (var "+" { line = 2, column = 10 })
-                                    (var "x" { line = 2, column = 7 })
-                                    (Integer 1 { line = 2, column = 11 })
-                                    { line = 2, column = 10 }
-                                )
-                              )
-                            ]
-                            (Application
-                                (var "f" { line = 5, column = 2 })
-                                (Integer 4 { line = 5, column = 4 })
-                                { line = 5, column = 3 }
-                            )
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "multiple bindings" <|
             \() ->
@@ -202,20 +202,20 @@ in
             """
                     |> isExpression
                         (Let
-                            [ ( var "a" { line = 1, column = 1 }
-                              , Integer 42 { line = 1, column = 5 }
+                            [ ( var "a" { line = 0, column = 1 }
+                              , Integer 42 { line = 0, column = 5 }
                               )
-                            , ( var "b" { line = 3, column = 1 }
+                            , ( var "b" { line = 2, column = 1 }
                               , (BinOp
-                                    (var "+" { line = 3, column = 8 })
-                                    (var "a" { line = 3, column = 5 })
-                                    (Integer 1 { line = 3, column = 9 })
-                                    { line = 3, column = 8 }
+                                    (var "+" { line = 2, column = 8 })
+                                    (var "a" { line = 2, column = 5 })
+                                    (Integer 1 { line = 2, column = 9 })
+                                    { line = 2, column = 8 }
                                 )
                               )
                             ]
-                            (var "b" { line = 6, column = 2 })
-                            { line = 1, column = 0 }
+                            (var "b" { line = 5, column = 2 })
+                            { line = 0, column = 0 }
                         )
         ]
 
@@ -235,18 +235,18 @@ case x of
           """
                     |> isExpression
                         (Case
-                            (var "x" { line = 1, column = 5 })
-                            [ ( var "Nothing" { line = 1, column = 1 }
-                              , Integer 0 { line = 2, column = 3 }
+                            (var "x" { line = 0, column = 5 })
+                            [ ( var "Nothing" { line = 0, column = 1 }
+                              , Integer 0 { line = 1, column = 3 }
                               )
                             , ( Application
-                                    (var "Just" { line = 4, column = 1 })
-                                    (var "y" { line = 4, column = 6 })
-                                    { line = 4, column = 5 }
-                              , (var "y" { line = 6, column = 4 })
+                                    (var "Just" { line = 3, column = 1 })
+                                    (var "y" { line = 3, column = 6 })
+                                    { line = 3, column = 5 }
+                              , (var "y" { line = 5, column = 4 })
                               )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "binding to underscore" <|
             \() ->
@@ -257,12 +257,12 @@ case x of
           """
                     |> isExpression
                         (Case
-                            (var "x" { line = 1, column = 5 })
-                            [ ( var "_" { line = 1, column = 1 }
-                              , Integer 42 { line = 3, column = 4 }
+                            (var "x" { line = 0, column = 5 })
+                            [ ( var "_" { line = 0, column = 1 }
+                              , Integer 42 { line = 2, column = 4 }
                               )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         ]
 
@@ -275,9 +275,9 @@ application =
                 "f a"
                     |> isExpression
                         (Application
-                            (var "f" { line = 1, column = 0 })
-                            (var "a" { line = 1, column = 2 })
-                            { line = 1, column = 1 }
+                            (var "f" { line = 0, column = 0 })
+                            (var "a" { line = 0, column = 2 })
+                            { line = 0, column = 1 }
                         )
         , test "curried application" <|
             \() ->
@@ -285,12 +285,12 @@ application =
                     |> isExpression
                         (Application
                             (Application
-                                (var "f" { line = 1, column = 0 })
-                                (var "a" { line = 1, column = 2 })
-                                { line = 1, column = 1 }
+                                (var "f" { line = 0, column = 0 })
+                                (var "a" { line = 0, column = 2 })
+                                { line = 0, column = 1 }
                             )
-                            (var "b" { line = 1, column = 4 })
-                            { line = 1, column = 3 }
+                            (var "b" { line = 0, column = 4 })
+                            { line = 0, column = 3 }
                         )
         , test "curried application with parens" <|
             \() ->
@@ -298,12 +298,12 @@ application =
                     |> isExpression
                         (Application
                             (Application
-                                (var "f" { line = 1, column = 1 })
-                                (var "a" { line = 1, column = 3 })
-                                { line = 1, column = 2 }
+                                (var "f" { line = 0, column = 1 })
+                                (var "a" { line = 0, column = 3 })
+                                { line = 0, column = 2 }
                             )
-                            (var "b" { line = 1, column = 6 })
-                            { line = 1, column = 5 }
+                            (var "b" { line = 0, column = 6 })
+                            { line = 0, column = 5 }
                         )
         , test "multiline application" <|
             \() ->
@@ -311,30 +311,30 @@ application =
                     |> isExpression
                         (Application
                             (Application
-                                (var "f" { line = 1, column = 0 })
-                                (var "a" { line = 1, column = 0 })
-                                { line = 1, column = 0 }
+                                (var "f" { line = 0, column = 0 })
+                                (var "a" { line = 1, column = 1 })
+                                { line = 0, column = 1 }
                             )
-                            (var "b" { line = 3, column = 1 })
-                            { line = 3, column = 0 }
+                            (var "b" { line = 2, column = 1 })
+                            { line = 1, column = 2 }
                         )
         , test "multiline bug" <|
             \() ->
                 "f\n (==)"
                     |> isExpression
                         (Application
-                            (var "f" { line = 1, column = 0 })
-                            (var "==" { line = 2, column = 1 })
-                            { line = 2, column = 0 }
+                            (var "f" { line = 0, column = 0 })
+                            (var "==" { line = 1, column = 1 })
+                            { line = 1, column = 0 }
                         )
         , test "same multiline bug" <|
             \() ->
                 "f\n \"I like the symbol =\""
                     |> isExpression
                         (Application
-                            (var "f" { line = 1, column = 0 })
-                            (String "I like the symbol =" { line = 2, column = 1 })
-                            { line = 2, column = 0 }
+                            (var "f" { line = 0, column = 0 })
+                            (String "I like the symbol =" { line = 1, column = 1 })
+                            { line = 0, column = 0 }
                         )
         , test "constructor application" <|
             \() ->
@@ -342,12 +342,12 @@ application =
                     |> isExpression
                         (Application
                             (Application
-                                (var "Cons" { line = 1, column = 0 })
-                                (var "a" { line = 1, column = 5 })
-                                { line = 1, column = 4 }
+                                (var "Cons" { line = 0, column = 0 })
+                                (var "a" { line = 0, column = 5 })
+                                { line = 0, column = 4 }
                             )
-                            (var "Nil" { line = 1, column = 7 })
-                            { line = 1, column = 6 }
+                            (var "Nil" { line = 0, column = 7 })
+                            { line = 0, column = 6 }
                         )
         ]
 
@@ -356,26 +356,26 @@ tuple : Test
 tuple =
     describe "Tuples"
         [ test "Empty tuple" <|
-            \() -> "()" |> isExpression (var "()" { line = 1, column = 0 })
+            \() -> "()" |> isExpression (var "()" { line = 0, column = 0 })
         , test "Simple tuple" <|
             \() ->
                 "(a, b)"
                     |> isExpression
                         (Tuple
-                            [ (var "a" { line = 1, column = 1 })
-                            , (var "b" { line = 1, column = 4 })
+                            [ (var "a" { line = 0, column = 1 })
+                            , (var "b" { line = 0, column = 4 })
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "Simple tuple with format" <|
             \() ->
                 "( a, b )"
                     |> isExpression
                         (Tuple
-                            [ (var "a" { line = 1, column = 2 })
-                            , (var "b" { line = 1, column = 5 })
+                            [ (var "a" { line = 0, column = 2 })
+                            , (var "b" { line = 0, column = 5 })
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         ]
 
@@ -383,17 +383,17 @@ tuple =
 list : Test
 list =
     describe "Lists"
-        [ test "Empty list" <| \() -> "[]" |> isExpression (List [] { line = 1, column = 0 })
+        [ test "Empty list" <| \() -> "[]" |> isExpression (List [] { line = 0, column = 0 })
         , test "Simple list" <|
             \() ->
                 "[1, 2]"
                     |> isExpression
                         (List
                             [ Integer 1
-                                { line = 1, column = 1 }
-                            , Integer 2 { line = 1, column = 4 }
+                                { line = 0, column = 1 }
+                            , Integer 2 { line = 0, column = 4 }
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "Tuple list" <|
             \() ->
@@ -401,19 +401,19 @@ list =
                     |> isExpression
                         (List
                             [ (Tuple
-                                [ (var "a" { line = 1, column = 2 })
-                                , (var "b" { line = 1, column = 5 })
+                                [ (var "a" { line = 0, column = 2 })
+                                , (var "b" { line = 0, column = 5 })
                                 ]
-                                { line = 1, column = 1 }
+                                { line = 0, column = 1 }
                               )
                             , (Tuple
-                                [ (var "a" { line = 1, column = 10 })
-                                , (var "b" { line = 1, column = 13 })
+                                [ (var "a" { line = 0, column = 10 })
+                                , (var "b" { line = 0, column = 13 })
                                 ]
-                                { line = 1, column = 9 }
+                                { line = 0, column = 9 }
                               )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         ]
 
@@ -426,19 +426,19 @@ record =
                 "{a = b}"
                     |> isExpression
                         (Record
-                            [ ( "a", (var "b" { line = 1, column = 5 }) )
+                            [ ( "a", (var "b" { line = 0, column = 5 }) )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "Simple record with many fields" <|
             \() ->
                 "{a = b, b = 2}"
                     |> isExpression
                         (Record
-                            [ ( "a", (var "b" { line = 1, column = 5 }) )
-                            , ( "b", (Integer 2 { line = 1, column = 12 }) )
+                            [ ( "a", (var "b" { line = 0, column = 5 }) )
+                            , ( "b", (Integer 2 { line = 0, column = 12 }) )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "Simple record with many tuple fields" <|
             \() ->
@@ -447,22 +447,22 @@ record =
                         (Record
                             [ ( "a"
                               , (Tuple
-                                    [ (var "a" { line = 1, column = 6 })
-                                    , (var "b" { line = 1, column = 9 })
+                                    [ (var "a" { line = 0, column = 6 })
+                                    , (var "b" { line = 0, column = 9 })
                                     ]
-                                    { line = 1, column = 5 }
+                                    { line = 0, column = 5 }
                                 )
                               )
                             , ( "b"
                               , (Tuple
-                                    [ (var "a" { line = 1, column = 18 })
-                                    , (var "b" { line = 1, column = 21 })
+                                    [ (var "a" { line = 0, column = 18 })
+                                    , (var "b" { line = 0, column = 21 })
                                     ]
-                                    { line = 1, column = 17 }
+                                    { line = 0, column = 17 }
                                 )
                               )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "Simple record with updated field" <|
             \() ->
@@ -470,10 +470,10 @@ record =
                     |> isExpression
                         (RecordUpdate
                             "a"
-                            [ ( "b", (Integer 2 { line = 1, column = 9 }) )
-                            , ( "c", (Integer 3 { line = 1, column = 16 }) )
+                            [ ( "b", (Integer 2 { line = 0, column = 9 }) )
+                            , ( "c", (Integer 3 { line = 0, column = 16 }) )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "Simple record with advanced field" <|
             \() ->
@@ -482,13 +482,13 @@ record =
                         (Record
                             [ ( "a"
                               , (Application
-                                    (var "Just" { line = 1, column = 5 })
-                                    (Integer 2 { line = 1, column = 10 })
-                                    { line = 1, column = 9 }
+                                    (var "Just" { line = 0, column = 5 })
+                                    (Integer 2 { line = 0, column = 10 })
+                                    { line = 0, column = 9 }
                                 )
                               )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "Simple update record with advanced field" <|
             \() ->
@@ -498,23 +498,23 @@ record =
                             "a"
                             [ ( "a"
                               , (Application
-                                    (var "Just" { line = 1, column = 9 })
-                                    (Integer 2 { line = 1, column = 14 })
-                                    { line = 1, column = 13 }
+                                    (var "Just" { line = 0, column = 9 })
+                                    (Integer 2 { line = 0, column = 14 })
+                                    { line = 0, column = 13 }
                                 )
                               )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "Simplified record destructuring pattern" <|
             \() ->
                 "{a, b}"
                     |> isExpression
                         (Record
-                            [ ( "a", var "a" { line = 1, column = 1 } )
-                            , ( "b", var "b" { line = 1, column = 4 } )
+                            [ ( "a", var "a" { line = 0, column = 1 } )
+                            , ( "b", var "b" { line = 0, column = 4 } )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         ]
 
@@ -523,85 +523,85 @@ expressions : Test
 expressions =
     describe "Expressions"
         [ test "Operator in parens" <|
-            \() -> "(+)" |> isExpression (var "+" { line = 1, column = 0 })
+            \() -> "(+)" |> isExpression (var "+" { line = 0, column = 0 })
         , test "Operator passed to map" <|
             \() ->
                 "reduce (+) list"
                     |> isExpression
                         (Application
                             (Application
-                                (var "reduce" { line = 1, column = 0 })
-                                (var "+" { line = 1, column = 7 })
-                                { line = 1, column = 6 }
+                                (var "reduce" { line = 0, column = 0 })
+                                (var "+" { line = 0, column = 7 })
+                                { line = 0, column = 6 }
                             )
-                            (var "list" { line = 1, column = 11 })
-                            { line = 1, column = 10 }
+                            (var "list" { line = 0, column = 11 })
+                            { line = 0, column = 10 }
                         )
         , test "partial application" <|
             \() ->
                 "(+) 2"
                     |> isExpression
                         (Application
-                            (var "+" { line = 1, column = 0 })
-                            (Integer 2 { line = 1, column = 4 })
-                            { line = 1, column = 3 }
+                            (var "+" { line = 0, column = 0 })
+                            (Integer 2 { line = 0, column = 4 })
+                            { line = 0, column = 3 }
                         )
         , test "Case with as" <|
             \() ->
                 "case a of \nT _ as x -> 1"
                     |> isExpression
                         (Case
-                            (var "a" { line = 1, column = 5 })
+                            (var "a" { line = 0, column = 5 })
                             ([ ( BinOp
-                                    (var "as" { line = 2, column = 4 })
+                                    (var "as" { line = 1, column = 4 })
                                     (Application
-                                        (var "T" { line = 2, column = 0 })
-                                        (var "_" { line = 2, column = 2 })
-                                        { line = 2, column = 1 }
+                                        (var "T" { line = 1, column = 0 })
+                                        (var "_" { line = 1, column = 2 })
+                                        { line = 1, column = 1 }
                                     )
-                                    (var "x" { line = 2, column = 7 })
-                                    { line = 2, column = 4 }
-                               , Integer 1 { line = 2, column = 12 }
+                                    (var "x" { line = 1, column = 7 })
+                                    { line = 1, column = 4 }
+                               , Integer 1 { line = 1, column = 12 }
                                )
                              ]
                             )
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "cons has right assoc" <|
             \() ->
                 "a :: b :: c"
                     |> isExpression
                         (BinOp
-                            (var "::" { line = 1, column = 4 })
-                            (var "a" { line = 1, column = 0 })
+                            (var "::" { line = 0, column = 4 })
+                            (var "a" { line = 0, column = 0 })
                             (BinOp
-                                (var "::" { line = 1, column = 9 })
-                                (var "b" { line = 1, column = 5 })
-                                (var "c" { line = 1, column = 10 })
-                                { line = 1, column = 9 }
+                                (var "::" { line = 0, column = 9 })
+                                (var "b" { line = 0, column = 5 })
+                                (var "c" { line = 0, column = 10 })
+                                { line = 0, column = 9 }
                             )
-                            { line = 1, column = 4 }
+                            { line = 0, column = 4 }
                         )
         , test "cons has right assoc with tuple" <|
             \() ->
                 "(a, a :: b :: c)"
                     |> isExpression
                         (Tuple
-                            [ (var "a" { line = 1, column = 1 })
+                            [ (var "a" { line = 0, column = 1 })
                             , ((BinOp
-                                    (var "::" { line = 1, column = 8 })
-                                    (var "a" { line = 1, column = 4 })
+                                    (var "::" { line = 0, column = 8 })
+                                    (var "a" { line = 0, column = 4 })
                                )
                                 (BinOp
-                                    (var "::" { line = 1, column = 13 })
-                                    (var "b" { line = 1, column = 9 })
-                                    (var "c" { line = 1, column = 14 })
-                                    { line = 1, column = 13 }
+                                    (var "::" { line = 0, column = 13 })
+                                    (var "b" { line = 0, column = 9 })
+                                    (var "c" { line = 0, column = 14 })
+                                    { line = 0, column = 13 }
                                 )
-                                { line = 1, column = 8 }
+                                { line = 0, column = 8 }
                               )
                             ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "Destructuring lambda" <|
             \() ->
@@ -609,15 +609,15 @@ expressions =
                     |> isExpression
                         (Lambda
                             [ (Tuple
-                                [ (var "a" { line = 1, column = 2 })
-                                , (var "b" { line = 1, column = 4 })
+                                [ (var "a" { line = 0, column = 2 })
+                                , (var "b" { line = 0, column = 4 })
                                 ]
-                                { line = 1, column = 1 }
+                                { line = 0, column = 1 }
                               )
-                            , (var "acc" { line = 1, column = 7 })
+                            , (var "acc" { line = 0, column = 7 })
                             ]
-                            (Integer 1 { line = 1, column = 14 })
-                            { line = 1, column = 0 }
+                            (Integer 1 { line = 0, column = 14 })
+                            { line = 0, column = 0 }
                         )
         , test "Destructuring Let" <|
             \() ->
@@ -625,31 +625,31 @@ expressions =
                     |> isExpression
                         (Let
                             [ ( (Tuple
-                                    [ (var "a" { line = 1, column = 5 })
-                                    , (var "b" { line = 1, column = 7 })
+                                    [ (var "a" { line = 0, column = 5 })
+                                    , (var "b" { line = 0, column = 7 })
                                     ]
-                                    { line = 1, column = 4 }
+                                    { line = 0, column = 4 }
                                 )
                               , (Tuple
                                     [ Integer 1
-                                        { line = 1, column = 13 }
-                                    , Integer 2 { line = 1, column = 15 }
+                                        { line = 0, column = 13 }
+                                    , Integer 2 { line = 0, column = 15 }
                                     ]
-                                    { line = 1, column = 12 }
+                                    { line = 0, column = 12 }
                                 )
                               )
                             ]
-                            (var "a" { line = 1, column = 21 })
-                            { line = 1, column = 0 }
+                            (var "a" { line = 0, column = 21 })
+                            { line = 0, column = 0 }
                         )
         , test "Access" <|
             \() ->
                 "Module.a"
                     |> isExpression
                         (Access
-                            (var "Module" { line = 1, column = 0 })
+                            (var "Module" { line = 0, column = 0 })
                             [ "a" ]
-                            { line = 1, column = 0 }
+                            { line = 0, column = 0 }
                         )
         , test "AccessFunction" <|
             \() ->
@@ -657,11 +657,11 @@ expressions =
                     |> isExpression
                         (Application
                             (Application
-                                (var "map" { line = 1, column = 0 })
-                                (AccessFunction "a" { line = 1, column = 4 })
-                                { line = 1, column = 3 }
+                                (var "map" { line = 0, column = 0 })
+                                (AccessFunction "a" { line = 0, column = 4 })
+                                { line = 0, column = 3 }
                             )
-                            (var "list" { line = 1, column = 7 })
-                            { line = 1, column = 6 }
+                            (var "list" { line = 0, column = 7 })
+                            { line = 0, column = 6 }
                         )
         ]

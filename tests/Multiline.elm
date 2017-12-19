@@ -22,7 +22,7 @@ makeApplication : String -> List String -> Expression
 makeApplication name args =
     let
         line n =
-            { line = n + 1, column = 0 }
+            { line = n, column = 0 }
 
         nextArgs ( index, name ) acc =
             Application acc (var name <| line index) (line index)
